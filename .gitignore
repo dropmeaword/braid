@@ -1,0 +1,7 @@
+
+arduino/GVS-research/GVS2/build
+arduino/GVS-research/GVS2/.sconsign.dblite
+*.pyc
+*.hex
+*.elf
+
