@@ -9,3 +9,5 @@ used for you can read more about it on the [project page](http://www.spinningkid
 
 
 
+Running Average code by Rob Tillaart
+Sensor Filters code by Jeroen Doggen, slightly modified from original.
