@@ -4,8 +4,8 @@
 #include "Arduino.h"
 
 
-#define UNIT_ID "B"
-#define UNIT_ID_OTHER "A"
+#define UNIT_ID "A"
+#define UNIT_ID_OTHER "B"
 
 #define MAX_VOLTAGE 24   // in V
 #define MAX_CURRENT 4.5  // in mA
