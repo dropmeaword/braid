@@ -130,7 +130,7 @@ int convertAccel2Stimulation(int xa, int ya, int za) {
   //float fya = (ya - calibration) / 512;
   //float fza = (za - calibration) / 512;
 
-  float sk = pow(fxa, 9); // calculate scaling exponential smoothing factor
+  float sk = pow(fxa, 5); // calculate scaling exponential smoothing factor
   return ceil(GVS_CLAMP * sk);
 }
 
@@ -156,7 +156,7 @@ void cb_other_inclination() {
       int oy = cmdMessenger.getAsLong();
       int oz = cmdMessenger.getAsLong();
       
-      if( (ox < -200) || (ox > 200) ) {
+      if( abs(ox)  > 200 ) {
         // conver it to a stimulation level
         int st = convertAccel2Stimulation(ox, oy, oz);
         stim.easeTo(st, 500);
@@ -263,7 +263,7 @@ void loop()  {
 
 
   if(MODE_MANUAL == gvs._mode) {
-    if( (gvs._accx < -200) || (gvs._accx > 200) ) {
+    if( abs(gvs._accx)  > 200 ) {
       int stimulus = convertAccel2Stimulation(gvs._accx, gvs._accy, gvs._accz);
       stim.easeTo(stimulus, 500);
     }
