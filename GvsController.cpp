@@ -52,17 +52,18 @@ void GvsController::update() {
   
   // update level of stimulation
   if(_level != _lastLevel) {
-    analogWrite(PIN_LEVEL_OUT, _level);
+    int lvl = abs(_level);
+    analogWrite(PIN_LEVEL_OUT, lvl);
   }
 
-  // set direction LEDs properly  
-  if(_level < 0) {
+  // set direction LEDs properly
+  if(_level < -1) {
     digitalWrite(PIN_LED_LEFT, HIGH);
     digitalWrite(PIN_LED_RIGHT, LOW);
-  } else if (_level > 0) {
+  } else if (_level > 1) {
     digitalWrite(PIN_LED_LEFT, LOW);
     digitalWrite(PIN_LED_RIGHT, HIGH);
-  } else if (_level == 0) {
+  } else {
     digitalWrite(PIN_LED_LEFT, LOW);
     digitalWrite(PIN_LED_RIGHT, LOW);
   }
@@ -124,7 +125,10 @@ void GvsController::readDeviceStatus() {
   _mode = readSwitchMode();
   
   // set stimulation level to 0 when device changes status
-  if(_mode != _lastMode) { _level = 0; _lastMode = _mode; }
+  if(_mode != _lastMode) { 
+    _level = 0; 
+    _lastMode = _mode; 
+  }
 
   _current = analogRead(PIN_CURRENT_IN);
   _voltage = analogRead(PIN_OUTPUTVOLT_IN);
@@ -158,15 +162,14 @@ void GvsController::switchToRight() {
     // negative values are left-sided stimulations
     if(lvl < 0) {
       switchToLeft();
-      _level = abs(lvl);
     } else {
       switchToRight();
-      _level = lvl;
     }
+
     // clamp to 8-bit (necessary for pwm)
-    if(_level > 255) _level = 255;
+    _level = clamp(lvl, -255, 255);
   }
 
   int GvsController::getLevel() { 
-    return (_dir == DIR_LEFT) ? ceil((float)(_level)*(-1.0f))  : _level; 
+    return _level;
   }

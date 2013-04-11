@@ -27,3 +27,28 @@ unsigned long xmap(unsigned long x, unsigned long in_min, unsigned long in_max, 
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+int clamp(int val, int min, int max)
+{
+    if (val < min)
+        val = min;
+    else if (val > max)
+        val = max;
+    return val;
+}
+
+int smaxabs2(int a, int b) {
+  if((a < 0) && (b < 0)) {
+		return min(a, b);
+	} else if ((a < 0) && ( b > 0)) {
+		return ((abs(a) > b) ? a : b);
+	} else if ((a > 0) && ( b < 0)) {
+		return ((abs(b) > a) ? b : a);
+	} else {
+		return max(a, b);
+	}
+}
+ 
+int smaxabs3(int a, int b, int c) {
+	int tmp = smaxabs2(a, b);
+	return smaxabs2(c, tmp);
+}

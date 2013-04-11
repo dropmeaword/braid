@@ -119,19 +119,13 @@ void cb_control() {
 }
 
 /**
- * Convert accelerometer values from the other device
- * into stimulation levels for this device.
+ * Convert reference value from accelero into stimulation levels for this device.
+ * The reference of the accelero is the maximum value of the three axis readings.
  */
-int convertAccel2Stimulation(int xa, int ya, int za) {
-  // convert from 10-bit to [-1.0, 1.0]
-//  int calibration = 512;
-
-  float fxa = xa / 512;
-  //float fya = (ya - calibration) / 512;
-  //float fza = (za - calibration) / 512;
-
-  float sk = pow(fxa, 5); // calculate scaling exponential smoothing factor
-  return ceil(GVS_CLAMP * sk);
+int convertAccel2Stimulation(int ref) {
+  float fref = float(ref) / 512;
+  float sk = pow(fref, 3); // calculate scaling exponential smoothing factor
+  return ceil(float(GVS_CLAMP) * sk);
 }
 
 // callback to process inclination of the other device
@@ -156,9 +150,10 @@ void cb_other_inclination() {
       int oy = cmdMessenger.getAsLong();
       int oz = cmdMessenger.getAsLong();
       
-      if( abs(ox)  > 200 ) {
+      int ref = smaxabs3(ox, oy, oz);
+      if( abs(ref)  > 150 ) {
         // conver it to a stimulation level
-        int st = convertAccel2Stimulation(ox, oy, oz);
+        int st = convertAccel2Stimulation(ref);
         stim.easeTo(st, 500);
       }
       //gvs.setLevel( st );
@@ -263,8 +258,9 @@ void loop()  {
 
 
   if(MODE_MANUAL == gvs._mode) {
-    if( abs(gvs._accx)  > 200 ) {
-      int stimulus = convertAccel2Stimulation(gvs._accx, gvs._accy, gvs._accz);
+    int ref = smaxabs3(gvs._accx, gvs._accy, gvs._accz);
+    if( abs(ref)  > 150 ) {
+      int stimulus = convertAccel2Stimulation(ref);
       stim.easeTo(stimulus, 500);
     }
   }
