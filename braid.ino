@@ -33,10 +33,8 @@ boolean sustain2 = false;
 boolean otherIsOnline = false;
 
 // running average init
-int mra_samples = 33; //1000/INTERVAL_MEASUREMENT;
-RunningAverage mrax(mra_samples);
-RunningAverage mray(mra_samples);
-RunningAverage mraz(mra_samples);
+int mra_samples = 3*8;
+RunningAverage mra(mra_samples);
 
 char sercommand[200]; // incoming serial command
 int cidx;
@@ -123,9 +121,10 @@ void cb_control() {
  * The reference of the accelero is the maximum value of the three axis readings.
  */
 int convertAccel2Stimulation(int ref) {
-  float fref = float(ref) / 512;
+  float fref = float(ref) / 256;
   float sk = pow(fref, 3); // calculate scaling exponential smoothing factor
-  return ceil(float(GVS_CLAMP) * sk);
+  int retval = ceil(float(GVS_CLAMP) * sk * 4.0);
+  return clamp(retval, -255, 255);
 }
 
 // callback to process inclination of the other device
@@ -151,11 +150,15 @@ void cb_other_inclination() {
       int oz = cmdMessenger.getAsLong();
       
       int ref = smaxabs3(ox, oy, oz);
+      int st = convertAccel2Stimulation(ref);
+      mra.addValue(st);
+      /*
       if( abs(ref)  > 150 ) {
         // conver it to a stimulation level
         int st = convertAccel2Stimulation(ref);
         stim.easeTo(st, 500);
       }
+      */
       //gvs.setLevel( st );
     }
   }
@@ -242,10 +245,6 @@ void loop()  {
   // @todo send inclination data as often as possible
   if( timeout(interval1, &tmarkMeasurement) ) {
     gvs.readAccelValues();
-    // update running average
-    mrax.addValue(gvs._accx);
-    mray.addValue(gvs._accz);
-    mraz.addValue(gvs._accz);
     // send thru serial
     sendInclination();
   }
@@ -259,15 +258,23 @@ void loop()  {
 
   if(MODE_MANUAL == gvs._mode) {
     int ref = smaxabs3(gvs._accx, gvs._accy, gvs._accz);
+    int st = convertAccel2Stimulation(ref);
+    mra.addValue(st);
+    /*
     if( abs(ref)  > 150 ) {
       int stimulus = convertAccel2Stimulation(ref);
       stim.easeTo(stimulus, 500);
     }
+    */
   }
 
+  /*
   unsigned long m = millis();
   stim.update( m );
   int lvl = ceil(stim.getStimulationLevel());
+  gvs.setLevel( lvl );
+  */
+  int lvl = ceil(mra.getAverage());
   gvs.setLevel( lvl );
   gvs.update();
 
