@@ -1,6 +1,6 @@
 {
   "ARDUINO_HOME" : "/home/zilog/development/tools/arduino-1.0.5",
-  "ARDUINO_PORT" : "/dev/ttyUSB*",
+  "ARDUINO_PORT" : "/dev/ttyUSB0",
   "AVR_HOME" : "/usr/bin/",
   "EXTRA_LIB" : "./lib/"
 }
