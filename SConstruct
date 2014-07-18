@@ -386,6 +386,10 @@ local_sources = [x.replace(build_top, 'build/local/') for x in local_sources]
 if local_sources:
     envArduino.Append(CPPPATH = 'build/local')
 
+# @lfernandez Add all library paths to environment indiscrimantely
+for p in ARDUINO_LIBS:
+	envArduino.Append(CPPPATH = p)
+
 # Convert sketch(.pde) to cpp
 envArduino.Processing('build/' + TARGET + '.cpp', 'build/' + TARGET + sketchExt)
 VariantDir('build', '.')
@@ -397,7 +401,7 @@ sources += all_libs_sources
 
 # Finally Build!!
 core_objs = envArduino.Object(core_sources)
-objs = envArduino.Object(sources) #, LIBS=libs, LIBPATH='.')
+objs = envArduino.Object(sources) #, LIBS=ARDUINO_LIBS, LIBPATH='.')
 objs = objs + envArduino.CompressCore('build/core.a', core_objs)
 envArduino.Elf(TARGET + '.elf', objs)
 envArduino.Hex(TARGET + '.hex', TARGET + '.elf')
