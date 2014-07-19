@@ -10,7 +10,8 @@ if [ $EUID != 0 ]; then
 fi
 
 
-apt-get install gcc-avr avr-libc
+apt-get install gcc-avr avr-libc avrdude
+
 
 if command -v foo >/dev/null 2>&1; then
 	pip install pyserial
