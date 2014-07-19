@@ -6,7 +6,55 @@ GvsController::GvsController() {
 }
 
 void GvsController::selfTest() {
-}
+ 
+   switch(_stepTest) {
+    case 0:
+      digitalWrite(PIN_LED_LEFT,  HIGH);
+      digitalWrite(PIN_LED_RIGHT, HIGH);
+      digitalWrite(PIN_LED_SPARE, HIGH);
+      digitalWrite(PIN_LED_POWER, HIGH);
+      break;
+    case 1:
+      digitalWrite(PIN_LED_LEFT,  LOW);
+      digitalWrite(PIN_LED_RIGHT, LOW);
+      digitalWrite(PIN_LED_SPARE, LOW);
+      digitalWrite(PIN_LED_POWER, LOW);
+      break;
+    case 2:
+      digitalWrite(PIN_LED_LEFT,  HIGH);
+      digitalWrite(PIN_LED_RIGHT, LOW);
+      digitalWrite(PIN_LED_SPARE, LOW);
+      digitalWrite(PIN_LED_POWER, LOW);
+      break;
+    case 3:
+      digitalWrite(PIN_LED_LEFT,  LOW);
+      digitalWrite(PIN_LED_RIGHT, HIGH);
+      digitalWrite(PIN_LED_SPARE, LOW);
+      digitalWrite(PIN_LED_POWER, LOW);
+      break;
+    case 4:
+      digitalWrite(PIN_LED_LEFT,  LOW);
+      digitalWrite(PIN_LED_RIGHT, LOW);
+      digitalWrite(PIN_LED_SPARE, HIGH);
+      digitalWrite(PIN_LED_POWER, LOW);
+      break;
+    case 5:
+      digitalWrite(PIN_LED_LEFT,  LOW);
+      digitalWrite(PIN_LED_RIGHT, LOW);
+      digitalWrite(PIN_LED_SPARE, LOW);
+      digitalWrite(PIN_LED_POWER, HIGH);
+      break;
+   };
+ 
+  _stepTest = _stepTest++ % 5;
+
+  /* test all the outputs */
+  if(_outputTest = HIGH) {
+    _outputTest =  LOW;
+  } else {
+    _outputTest =  HIGH;
+  }
+} // selfTest
 
 void GvsController::setup() {
   // INPUTS
@@ -24,8 +72,8 @@ void GvsController::setup() {
   // LEDs ouptputs for status indication
   pinMode(PIN_LED_LEFT, OUTPUT);
   pinMode(PIN_LED_RIGHT, OUTPUT);
-  pinMode(PIN_LED_MANUAL, OUTPUT);
-  pinMode(PIN_LED_AUTO, OUTPUT);
+  //pinMode(PIN_LED_MANUAL, OUTPUT);
+  //pinMode(PIN_LED_AUTO, OUTPUT);
   pinMode(PIN_LED_POWER, OUTPUT);
   
   _mode = MODE_AUTO;
@@ -67,7 +115,7 @@ void GvsController::update() {
     digitalWrite(PIN_LED_LEFT, LOW);
     digitalWrite(PIN_LED_RIGHT, LOW);
   }
-
+/*
   if(LOW == digitalRead(PIN_MANUALSWITCH_IN) ) {
     digitalWrite(PIN_LED_MANUAL, HIGH);
     digitalWrite(PIN_LED_AUTO, LOW);
@@ -75,6 +123,7 @@ void GvsController::update() {
     digitalWrite(PIN_LED_MANUAL, LOW);
     digitalWrite(PIN_LED_AUTO, HIGH);
   }
+  */
 }
 
 void GvsController::calibrate(unsigned long ms) {

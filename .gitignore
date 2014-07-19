@@ -5,3 +5,7 @@ arduino/GVS-research/GVS2/.sconsign.dblite
 *.hex
 *.elf
 
+*.dblite
+
+build/
+

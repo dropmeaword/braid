@@ -46,6 +46,9 @@ public:
   int _calibrationz;  
   boolean _calibrated;
 
+  int _outputTest;
+  int _stepTest;
+
 public:
   GvsController();
   

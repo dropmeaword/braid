@@ -27,6 +27,8 @@ unsigned long tmarkMeasurement = 0;
 unsigned long int interval1 = INTERVAL_MEASUREMENT;
 unsigned long int interval2 = INTERVAL_STATUS;
 
+unsigned long tmarkTest = 0;
+
 boolean sustain = false;
 boolean sustain2 = false;
 
@@ -45,14 +47,16 @@ StimulusControl stim;
 /*
  * stlimulus level should be clamped at 255, if you pass more than 8-bit resolution values the arduino starts sending really funky signals.
  */
+ /*
 #define ST_COUNT 3
 Stimulus stimuli[ST_COUNT] = {
     {128, 80},
     {255, 80},
     {0, 2000},
 };
+*/
 
-/*
+
 #define ST_COUNT 11
 Stimulus stimuli[ST_COUNT] = {
     {50, 500},
@@ -68,7 +72,7 @@ Stimulus stimuli[ST_COUNT] = {
     {0, 10},
     // 2.235s
 };
-*/
+
 
 // ///////////////////////////////////////////////////////////////////////////
 // MESSAGING
@@ -84,38 +88,6 @@ enum
   kSEND_CMDS_END, // marker
 };
 
-// callback control command
-void cb_acknowledge() {
-  char *s = cmdMessenger.getAsString();
-  if( 0 == strcmp(UNIT_ID_OTHER, s) ) {
-    otherIsOnline = true;
-  }
-}
-
-// callback control command
-void cb_control() {
-  // if we receive a control message and we are in manual mode
-  // parse it and set stimulation level
-  //sendLog("rcv_ctrl_msg");
-  if(MODE_MANUAL == gvs._mode) {
-    //sendLog("ctrl_msg_get_device");
-    char *s = cmdMessenger.getAsString();
-    // is the message meant for me?
-    if( 0 == strcmp(UNIT_ID, s) ) {
-      //sendLog("ctrl_msg_processing");
-      int level = cmdMessenger.getAsLong();
-      
-      //if( stim.hasArrived() ) { // if last stimulus has been fulfilled
-        stim.easeTo(level, 200);
-      //}
-      //long int duration = cmdMessenger.getAsLong();
-      //Serial.print(level);
-      //Serial.println(" << ");
-      //Serial.print(duration);
-    }
-  } // if manual mode
-}
-
 /**
  * Convert reference value from accelero into stimulation levels for this device.
  * The reference of the accelero is the maximum value of the three axis readings.
@@ -125,50 +97,6 @@ int convertAccel2Stimulation(int ref) {
   float sk = pow(fref, 3); // calculate scaling exponential smoothing factor
   int retval = ceil(float(GVS_CLAMP) * sk * 4.0);
   return clamp(retval, -255, 255);
-}
-
-// callback to process inclination of the other device
-void cb_other_inclination() {
-  //sendLog("received_acc_msg");
-  if(MODE_AUTO == gvs._mode) {
-    char *s = cmdMessenger.getAsString();
-
-    //sendLog(s);
-    /*
-    Serial.print("I am ");
-    Serial.print(UNIT_ID); 
-    Serial.print(" and I have received a message from ");
-    */
-
-    //sendLog("parsing_acc_msg");
-    // if msg comes from the other device
-    if( 0 == strcmp(UNIT_ID_OTHER, s) ) {
-      //sendLog("acc_msg_processing_other");
-      // parse inclination data
-      int ox = cmdMessenger.getAsLong();
-      int oy = cmdMessenger.getAsLong();
-      int oz = cmdMessenger.getAsLong();
-      
-      int ref = smaxabs3(ox, oy, oz);
-      int st = convertAccel2Stimulation(ref);
-      mra.addValue(st);
-      /*
-      if( abs(ref)  > 150 ) {
-        // conver it to a stimulation level
-        int st = convertAccel2Stimulation(ref);
-        stim.easeTo(st, 500);
-      }
-      */
-      //gvs.setLevel( st );
-    }
-  }
-}
-
-void msg_attach_callbacks()
-{
-  cmdMessenger.attach(kACK, cb_acknowledge);
-  cmdMessenger.attach(kCTR, cb_control);
-  cmdMessenger.attach(kACC, cb_other_inclination);
 }
 
 // ///////////////////////////////////////////////////////////////////////////
@@ -199,12 +127,11 @@ void setup()  {
   
   // Serial messaging
   cmdMessenger.print_LF_CR(); // make output more readable whilst debugging in Arduino Serial Monitor
-  msg_attach_callbacks();
   
   // acknowledge this device is present and ready
   sendAck();
-
-  stim.begin(gvs, 1); //, stimuli, ST_COUNT);
+  gvs._mode = MODE_MANUAL;
+  stim.begin(gvs, 1, stimuli, ST_COUNT);
 } 
 
 
@@ -232,51 +159,24 @@ void sendAck() {
 }
 
 void loop()  {
-  // if not calibrated, take five seconds to calibrate
-  if(gvs._calibrated == false) {
-    gvs.calibrate(5000);
-    char calib[128];
-    sprintf(calib, "calib_(%d,%d,%d)", gvs._calibrationx, gvs._calibrationy, gvs._calibrationz);
-    sendLog(calib);
-  }
-  // process incoming serial data
-  cmdMessenger.feedinSerialData();
-
   // @todo send inclination data as often as possible
   if( timeout(interval1, &tmarkMeasurement) ) {
     gvs.readAccelValues();
     // send thru serial
     sendInclination();
   }
+
   
-  // @todo  send the status only every now and then (maybe every 5 seconds)
+  // @todo  send the status only every now and then
   if( timeout(interval2, &tmarkStatus) ) {
     gvs.readDeviceStatus();
     sendStatus();
   }
 
-
-  if(MODE_MANUAL == gvs._mode) {
-    int ref = smaxabs3(gvs._accx, gvs._accy, gvs._accz);
-    int st = convertAccel2Stimulation(ref);
-    mra.addValue(st);
-    /*
-    if( abs(ref)  > 150 ) {
-      int stimulus = convertAccel2Stimulation(ref);
-      stim.easeTo(stimulus, 500);
-    }
-    */
+  // run a self-test step every second
+  if( timeout(1*1000, &tmarkTest) ) {
+    gvs.selfTest();
   }
-
-  /*
-  unsigned long m = millis();
-  stim.update( m );
-  int lvl = ceil(stim.getStimulationLevel());
-  gvs.setLevel( lvl );
-  */
-  int lvl = ceil(mra.getAverage());
-  gvs.setLevel( lvl );
-  gvs.update();
 
 } // loop()
 
