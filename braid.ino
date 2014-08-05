@@ -110,7 +110,7 @@ void setup()  {
    *
    * Rene's design uses 3.3V as reference for all analog inputs
    */
-  analogReference(EXTERNAL);
+  analogReference(DEFAULT);
   
   /*
    * Using the following line in your setup routine will 
@@ -178,5 +178,10 @@ void loop()  {
     gvs.selfTest();
   }
 
+  unsigned long m = millis();
+  stim.update( m );
+  int lvl = ceil(stim.getStimulationLevel());
+  gvs.setLevel( lvl );
+  gvs.update();
 } // loop()
 

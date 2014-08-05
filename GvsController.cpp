@@ -44,9 +44,15 @@ void GvsController::selfTest() {
       digitalWrite(PIN_LED_SPARE, LOW);
       digitalWrite(PIN_LED_POWER, HIGH);
       break;
+    case 6:
+      digitalWrite(PIN_LED_LEFT,  LOW);
+      digitalWrite(PIN_LED_RIGHT, LOW);
+      digitalWrite(PIN_LED_SPARE, LOW);
+      digitalWrite(PIN_LED_POWER, LOW);
+      break;
    };
  
-  _stepTest = _stepTest++ % 5;
+  _stepTest = _stepTest++ % 6;
 
   /* test all the outputs */
   if(_outputTest = HIGH) {
@@ -64,7 +70,7 @@ void GvsController::setup() {
   pinMode(PIN_ACCELX_IN, INPUT);
   pinMode(PIN_ACCELY_IN, INPUT);
   pinMode(PIN_ACCELZ_IN, INPUT);
-  pinMode(PIN_MANUALSWITCH_IN, INPUT);
+  //pinMode(PIN_MANUALSWITCH_IN, INPUT);
   // OUTPUTS
   pinMode(PIN_LEVEL_OUT, OUTPUT); 
   pinMode(PIN_DIRECTION_OUT, OUTPUT);
@@ -185,7 +191,7 @@ void GvsController::readDeviceStatus() {
 }
 
 int GvsController::readSwitchMode() {
-  return ((HIGH == digitalRead(PIN_MANUALSWITCH_IN)) ? MODE_MANUAL : MODE_AUTO);
+  return MODE_AUTO; //((HIGH == digitalRead(PIN_MANUALSWITCH_IN)) ? MODE_MANUAL : MODE_AUTO);
 }
 
 

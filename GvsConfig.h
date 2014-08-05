@@ -33,20 +33,14 @@
 #define PIN_ACCELZ_IN       A2
 #define PIN_BATTERY_IN      A5
 // (digital)
-#define PIN_MANUALSWITCH_IN  10
-
-#define PIN_DIRECTION_IN 9
-
 // OUT
 #define PIN_LEVEL_OUT      3 // stimulation level (pwm)
-#define PIN_DIRECTION_OUT  2 // stimulation direction (bin)
+#define PIN_DIRECTION_OUT  4 // stimulation direction (bin)
 
 // control LEDs
 #define PIN_LED_LEFT 5
 #define PIN_LED_RIGHT 6
 #define PIN_LED_SPARE 9
-//#define PIN_LED_MANUAL 2
-//#define PIN_LED_AUTO 7
-#define PIN_LED_POWER 5//2
+#define PIN_LED_POWER 2
 
 #endif  // __GVSCONFIG_H__
