@@ -41,6 +41,9 @@ RunningAverage mra(mra_samples);
 char sercommand[200]; // incoming serial command
 int cidx;
 
+// serial number of data packet sent out
+unsigned long framenum = 0;
+
 GvsController gvs;
 StimulusControl stim;
 
@@ -104,12 +107,6 @@ int convertAccel2Stimulation(int ref) {
 // ///////////////////////////////////////////////////////////////////////////
 
 void setup()  {
-  /*
-   * set the analog reference voltage to extern
-   * http://arduino.cc/en/Reference/AnalogReference?from=Reference.AREF
-   *
-   * Rene's design uses 3.3V as reference for all analog inputs
-   */
   analogReference(DEFAULT);
   
   /*
@@ -126,7 +123,10 @@ void setup()  {
   gvs.setup();
   
   // Serial messaging
-  cmdMessenger.print_LF_CR(); // make output more readable whilst debugging in Arduino Serial Monitor
+  cmdMessenger.print_LF_CR(); // make output more readable
+
+  // run self-test on startup
+  gvs.bootTest();
   
   // acknowledge this device is present and ready
   sendAck();
@@ -134,32 +134,33 @@ void setup()  {
   stim.begin(gvs, 1, stimuli, ST_COUNT);
 } 
 
-
 void sendInclination() {
   char msg[128];
-  sprintf(msg, "%s %d %d %d %d", UNIT_ID, gvs._accx, gvs._accy, gvs._accz, gvs.getLevel());
+  sprintf(msg, "%s %lu %d %d %d %d", UNIT_ID, framenum++, gvs._accx, gvs._accy, gvs._accz, gvs.getLevel());
   cmdMessenger.sendCmd(kACC, msg);
 }
 
 void sendStatus() {
   char msg[128];
-  sprintf(msg, "%s %d %d %d %d", UNIT_ID, gvs._mode, gvs._current, gvs._voltage, gvs._battery);
+  sprintf(msg, "%s %lu %d %d %d %d", UNIT_ID, framenum++, gvs._mode, gvs._current, gvs._voltage, gvs._battery);
   cmdMessenger.sendCmd(kSTT, msg);
 }
 
 void sendLog(char *log_) {
   char msg[128];
-  sprintf(msg, "%s %s", UNIT_ID, log_);
+  sprintf(msg, "%s %lu %s", UNIT_ID, framenum++, log_);
   cmdMessenger.sendCmd(kLOG, msg);
 }
 
 void sendAck() {
   digitalWrite(PIN_LED_POWER, HIGH);
+  char msg[128];
+  sprintf(msg, "%s %lu", UNIT_ID, framenum++);
   cmdMessenger.sendCmd(kACK, UNIT_ID);
 }
 
 void loop()  {
-  // @todo send inclination data as often as possible
+  // send inclination data as often as possible
   if( timeout(interval1, &tmarkMeasurement) ) {
     gvs.readAccelValues();
     // send thru serial
@@ -167,7 +168,7 @@ void loop()  {
   }
 
   
-  // @todo  send the status only every now and then
+  // send the status only every now and then
   if( timeout(interval2, &tmarkStatus) ) {
     gvs.readDeviceStatus();
     sendStatus();

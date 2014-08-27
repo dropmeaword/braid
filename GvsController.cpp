@@ -5,62 +5,19 @@
 GvsController::GvsController() {
 }
 
-void GvsController::selfTest() {
- 
-   switch(_stepTest) {
-    case 0:
-      digitalWrite(PIN_LED_LEFT,  HIGH);
-      digitalWrite(PIN_LED_RIGHT, HIGH);
-      digitalWrite(PIN_LED_SPARE, HIGH);
-      digitalWrite(PIN_LED_POWER, HIGH);
-      break;
-    case 1:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 2:
-      digitalWrite(PIN_LED_LEFT,  HIGH);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 3:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, HIGH);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 4:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, HIGH);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 5:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, HIGH);
-      break;
-    case 6:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-   };
- 
-  _stepTest = _stepTest++ % 6;
-
-  /* test all the outputs */
-  if(_outputTest = HIGH) {
-    _outputTest =  LOW;
-  } else {
-    _outputTest =  HIGH;
+void GvsController::bootTest() {
+  // flash all LEDs three times
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(PIN_LED_LEFT,  HIGH);
+    digitalWrite(PIN_LED_RIGHT, HIGH);
+    digitalWrite(PIN_LED_SPARE, HIGH);
+    delay(200);
+    digitalWrite(PIN_LED_LEFT,  LOW);
+    digitalWrite(PIN_LED_RIGHT, LOW);
+    digitalWrite(PIN_LED_SPARE, LOW);
+    delay(100);
   }
-} // selfTest
+}
 
 void GvsController::setup() {
   // INPUTS

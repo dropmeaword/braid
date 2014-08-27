@@ -1,0 +1,5 @@
+/// we can calculate the angles of inclination of the sensor, in radians:
+
+~theta = atan2( ~x, ( pow(~y,2) + pow(~z,2) ).sqrt );
+~psi = atan2( ~y, ( pow(~x,2) + pow(~z,2) ).sqrt );
+~phi = atan2( ( pow(~x,2) + pow(~y,2) ).sqrt, ~z );
