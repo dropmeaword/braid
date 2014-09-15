@@ -5,6 +5,7 @@
 GvsController::GvsController() {
 }
 
+/*
 void GvsController::bootTest() {
   // flash all LEDs three times
   for(int i = 0; i < 3; i++) {
@@ -18,6 +19,7 @@ void GvsController::bootTest() {
     delay(100);
   }
 }
+*/
 
 void GvsController::setup() {
   // INPUTS

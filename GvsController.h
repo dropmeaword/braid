@@ -52,8 +52,6 @@ public:
 public:
   GvsController();
   
-  void selfTest();
-  
   void update();
 
   void setup();

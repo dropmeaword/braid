@@ -126,7 +126,7 @@ void setup()  {
   cmdMessenger.print_LF_CR(); // make output more readable
 
   // run self-test on startup
-  gvs.bootTest();
+  // gvs.bootTest();
   
   // acknowledge this device is present and ready
   sendAck();
@@ -175,9 +175,9 @@ void loop()  {
   }
 
   // run a self-test step every second
-  if( timeout(1*1000, &tmarkTest) ) {
-    gvs.selfTest();
-  }
+  // if( timeout(1*1000, &tmarkTest) ) {
+  //   gvs.selfTest();
+  // }
 
   unsigned long m = millis();
   stim.update( m );
