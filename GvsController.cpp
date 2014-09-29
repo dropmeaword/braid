@@ -5,62 +5,30 @@
 GvsController::GvsController() {
 }
 
-void GvsController::selfTest() {
- 
-   switch(_stepTest) {
-    case 0:
-      digitalWrite(PIN_LED_LEFT,  HIGH);
-      digitalWrite(PIN_LED_RIGHT, HIGH);
-      digitalWrite(PIN_LED_SPARE, HIGH);
-      digitalWrite(PIN_LED_POWER, HIGH);
-      break;
-    case 1:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 2:
-      digitalWrite(PIN_LED_LEFT,  HIGH);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 3:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, HIGH);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 4:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, HIGH);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-    case 5:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, HIGH);
-      break;
-    case 6:
-      digitalWrite(PIN_LED_LEFT,  LOW);
-      digitalWrite(PIN_LED_RIGHT, LOW);
-      digitalWrite(PIN_LED_SPARE, LOW);
-      digitalWrite(PIN_LED_POWER, LOW);
-      break;
-   };
- 
-  _stepTest = _stepTest++ % 6;
+void GvsController::bootCheck() {
+    digitalWrite(PIN_LED_LEFT,  HIGH);
+    digitalWrite(PIN_LED_RIGHT, HIGH);
+    delay(500);
 
-  /* test all the outputs */
-  if(_outputTest = HIGH) {
-    _outputTest =  LOW;
-  } else {
-    _outputTest =  HIGH;
-  }
-} // selfTest
+    digitalWrite(PIN_LED_LEFT,  LOW);
+    digitalWrite(PIN_LED_RIGHT, LOW);
+    delay(500);
+
+    digitalWrite(PIN_LED_LEFT,  HIGH);
+    digitalWrite(PIN_LED_RIGHT, HIGH);
+    delay(500);
+
+    digitalWrite(PIN_LED_LEFT,  LOW);
+    digitalWrite(PIN_LED_RIGHT, LOW);
+    delay(500);
+
+    digitalWrite(PIN_LED_LEFT,  HIGH);
+    digitalWrite(PIN_LED_RIGHT, HIGH);
+
+    delay(500);
+    digitalWrite(PIN_LED_LEFT,  LOW);
+    digitalWrite(PIN_LED_RIGHT, LOW);
+}
 
 void GvsController::setup() {
   // INPUTS
@@ -78,8 +46,7 @@ void GvsController::setup() {
   // LEDs ouptputs for status indication
   pinMode(PIN_LED_LEFT, OUTPUT);
   pinMode(PIN_LED_RIGHT, OUTPUT);
-  //pinMode(PIN_LED_MANUAL, OUTPUT);
-  //pinMode(PIN_LED_AUTO, OUTPUT);
+  pinMode(PIN_LED_SPARE, OUTPUT);
   pinMode(PIN_LED_POWER, OUTPUT);
   
   _mode = MODE_AUTO;
@@ -103,23 +70,24 @@ void GvsController::update() {
   //_mode = readSwitchMode();
   readDeviceStatus();
   readAccelValues();
+
+  int lvl = abs(_level);
   
   // update level of stimulation
   if(_level != _lastLevel) {
-    int lvl = abs(_level);
     analogWrite(PIN_LEVEL_OUT, lvl);
   }
 
   // set direction LEDs properly
   if(_level < -1) {
-    digitalWrite(PIN_LED_LEFT, HIGH);
-    digitalWrite(PIN_LED_RIGHT, LOW);
+    analogWrite(PIN_LED_LEFT, lvl);
+    analogWrite(PIN_LED_RIGHT, 0);
   } else if (_level > 1) {
-    digitalWrite(PIN_LED_LEFT, LOW);
-    digitalWrite(PIN_LED_RIGHT, HIGH);
+    analogWrite(PIN_LED_LEFT, 0);
+    analogWrite(PIN_LED_RIGHT, lvl);
   } else {
-    digitalWrite(PIN_LED_LEFT, LOW);
-    digitalWrite(PIN_LED_RIGHT, LOW);
+    analogWrite(PIN_LED_LEFT, 0);
+    analogWrite(PIN_LED_RIGHT, 0);
   }
 /*
   if(LOW == digitalRead(PIN_MANUALSWITCH_IN) ) {
@@ -197,19 +165,19 @@ int GvsController::readSwitchMode() {
 
 void GvsController::switchToLeft() {
   // set current vector pin
-  digitalWrite(PIN_DIRECTION_OUT, HIGH);
-  // show state on LED
-  digitalWrite(PIN_LED_LEFT, HIGH);
-  digitalWrite(PIN_LED_RIGHT, LOW);
+  // digitalWrite(PIN_DIRECTION_OUT, HIGH);
+  // // show state on LED
+  // digitalWrite(PIN_LED_LEFT, HIGH);
+  // digitalWrite(PIN_LED_RIGHT, LOW);
   _dir = DIR_LEFT;
 }
 
 void GvsController::switchToRight() {
-  // set current vector pin
-  digitalWrite(PIN_DIRECTION_OUT, LOW);
+  // // set current vector pin
+  // digitalWrite(PIN_DIRECTION_OUT, LOW);
   // show state on LED
-  digitalWrite(PIN_LED_LEFT, LOW);
-  digitalWrite(PIN_LED_RIGHT, HIGH);
+  // digitalWrite(PIN_LED_LEFT, LOW);
+  // digitalWrite(PIN_LED_RIGHT, HIGH);
   _dir = DIR_RIGHT;
 }
 

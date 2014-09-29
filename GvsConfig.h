@@ -4,8 +4,8 @@
 #include "Arduino.h"
 
 
-#define UNIT_ID "A"
-#define UNIT_ID_OTHER "B"
+#define UNIT_ID "B"
+#define UNIT_ID_OTHER "A"
 
 #define MAX_VOLTAGE 16   // in V
 #define MAX_CURRENT 2.9  // in mA
@@ -38,9 +38,9 @@
 #define PIN_DIRECTION_OUT  4 // stimulation direction (bin)
 
 // control LEDs
-#define PIN_LED_LEFT 5
-#define PIN_LED_RIGHT 6
-#define PIN_LED_SPARE 9
+#define PIN_LED_LEFT 6
+#define PIN_LED_RIGHT 9
+#define PIN_LED_SPARE 5
 #define PIN_LED_POWER 2
 
 #endif  // __GVSCONFIG_H__

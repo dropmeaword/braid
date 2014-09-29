@@ -52,6 +52,7 @@ public:
 public:
   GvsController();
   
+  void bootCheck();
   void selfTest();
   
   void update();

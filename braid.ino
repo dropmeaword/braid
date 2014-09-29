@@ -56,20 +56,36 @@ Stimulus stimuli[ST_COUNT] = {
 };
 */
 
-
-#define ST_COUNT 11
+/*
+1s  ~ 15
+10s ~ 150
+30s ~ 450
+1m  ~ 900
+...
+and so on
+*/
+#define ST_COUNT 20
 Stimulus stimuli[ST_COUNT] = {
-    {50, 500},
-    {300, 20},
-    {380, 60},
-    {460, 40},
-    {100, 50},
-    {200, 50},
-    {900, 500},
-    {500, 1000},
-    {30,  50},
-    {10,  75},
-    {0, 10},
+    {0, 9000}, //30000},  // 2m 17s ==> 
+    {-300, 1000},
+    {300, 2000},
+    {200, 500},
+    {50, 1000},
+    {0, 10000},
+    {300, 2000},
+    {200, 1000},
+    {-100,  200},
+    {0,  6000},
+    {-300,  5000},
+    {0, 500},
+    {0, 10000},
+    {-300, 500},
+    {300, 500},
+    {-300, 500},
+    {300, 500},
+    {-300, 500},
+    {300, 500},
+    {0, 200},
     // 2.235s
 };
 
@@ -124,7 +140,9 @@ void setup()  {
   Serial.begin(COMM_BAUD_RATE);
 
   gvs.setup();
-  
+  gvs.calibrate(3000);
+  gvs.bootCheck();
+ 
   // Serial messaging
   cmdMessenger.print_LF_CR(); // make output more readable whilst debugging in Arduino Serial Monitor
   
@@ -159,23 +177,16 @@ void sendAck() {
 }
 
 void loop()  {
-  // @todo send inclination data as often as possible
+
   if( timeout(interval1, &tmarkMeasurement) ) {
     gvs.readAccelValues();
     // send thru serial
     sendInclination();
   }
-
   
-  // @todo  send the status only every now and then
   if( timeout(interval2, &tmarkStatus) ) {
     gvs.readDeviceStatus();
     sendStatus();
-  }
-
-  // run a self-test step every second
-  if( timeout(1*1000, &tmarkTest) ) {
-    gvs.selfTest();
   }
 
   unsigned long m = millis();
